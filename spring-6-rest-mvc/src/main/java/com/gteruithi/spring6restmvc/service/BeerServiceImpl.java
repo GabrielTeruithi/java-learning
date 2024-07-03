@@ -18,10 +18,12 @@ public class BeerServiceImpl implements BeerService {
 
     @Override
     public List<Beer> listBeers() {
+        log.debug("listBeers - BeerServiceImpl");
         return new ArrayList<>(beerMap.values());
     }
 
     public BeerServiceImpl() {
+        log.debug("Creating Beers - BeerServiceImpl");
         this.beerMap = new HashMap<>();
 
         Beer beer1 = Beer.builder()
@@ -68,9 +70,49 @@ public class BeerServiceImpl implements BeerService {
 
     @Override
     public Beer getBeerById(UUID id) {
-
-        log.debug("getBeerById - BeerServiceImpl. ID: " + id);
+        log.debug("getBeerById - BeerServiceImpl. Beer ID: " + id);
 
         return beerMap.get(id);
+    }
+
+    @Override
+    public Beer saveNewBear(Beer beer) {
+        log.debug("saveNewBear - BeerServiceImpl.");
+
+        Beer savedBeer = Beer.builder()
+                .id(UUID.randomUUID())
+                .createdDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .beerName(beer.getBeerName())
+                .beerStyle(beer.getBeerStyle())
+                .price(beer.getPrice())
+                .quantityOnHand(beer.getQuantityOnHand())
+                .upc(beer.getUpc())
+                .version(beer.getVersion())
+                .build();
+
+        beerMap.put(savedBeer.getId(), savedBeer);
+
+        return savedBeer;
+    }
+
+    @Override
+    public void updateById(UUID beerId, Beer beer) {
+        log.debug("updateById - BeerServiceImpl.");
+        log.debug("Beer ID: " + beerId);
+
+        Optional.ofNullable(beerMap.get(beerId)).ifPresent(oldBeer -> {
+            oldBeer.setId(beerId);
+            oldBeer.setBeerName(!beer.getBeerName().isEmpty() && !beer.getBeerName().isBlank() ? beer.getBeerName() : oldBeer.getBeerName());
+            oldBeer.setPrice(beer.getPrice() != null ? beer.getPrice() : oldBeer.getPrice());
+            oldBeer.setUpc(!beer.getUpc().isEmpty() && !beer.getUpc().isBlank() ? beer.getUpc() : oldBeer.getUpc());
+            oldBeer.setUpdateDate(LocalDateTime.now());
+            oldBeer.setVersion(beer.getVersion() != null ? beer.getVersion() : oldBeer.getVersion());
+            oldBeer.setQuantityOnHand(beer.getQuantityOnHand() != null ? beer.getQuantityOnHand() : oldBeer.getQuantityOnHand());
+            oldBeer.setCreatedDate(oldBeer.getCreatedDate());
+            oldBeer.setBeerStyle(beer.getBeerStyle() != null ? beer.getBeerStyle() : oldBeer.getBeerStyle());
+
+            beerMap.put(oldBeer.getId(), oldBeer);
+        });
     }
 }
