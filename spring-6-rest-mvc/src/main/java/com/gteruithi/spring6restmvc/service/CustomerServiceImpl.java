@@ -1,7 +1,5 @@
 package com.gteruithi.spring6restmvc.service;
 
-
-import com.gteruithi.spring6restmvc.model.Beer;
 import com.gteruithi.spring6restmvc.model.Customer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -79,7 +77,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateById(UUID customerId, Customer customer) {
-        log.debug("updateById - CustomerServiceImpl. Customer ID:" + customerId);
+        log.debug("updateById - CustomerServiceImpl.");
+        log.debug("Customer ID: " + customerId);
 
 
         Optional.ofNullable(customerMap.get(customerId)).ifPresent(oldCustomer -> {
@@ -92,5 +91,26 @@ public class CustomerServiceImpl implements CustomerService {
             customerMap.put(oldCustomer.getId(), oldCustomer);
         });
 
+    }
+
+    @Override
+    public void deleteById(UUID customerId) {
+        customerMap.remove(customerId);
+    }
+
+    @Override
+    public void patchCustomerById(UUID customerId, Customer customer) {
+        log.debug("patchCustomerById - CustomerServiceImpl.");
+        log.debug("Customer ID: " + customerId);
+
+        Optional.ofNullable(customerMap.get(customerId)).ifPresent(oldCustomer -> {
+            oldCustomer.setId(customerId);
+            oldCustomer.setCustomerName(!customer.getCustomerName().isEmpty() && !customer.getCustomerName().isBlank() ? customer.getCustomerName() : oldCustomer.getCustomerName());
+            oldCustomer.setVersion(customer.getVersion() != null ? customer.getVersion() : oldCustomer.getVersion());
+            oldCustomer.setCreatedDate(oldCustomer.getCreatedDate());
+            oldCustomer.setLastModifiedDate(LocalDateTime.now());
+
+            customerMap.put(oldCustomer.getId(), oldCustomer);
+        });
     }
 }

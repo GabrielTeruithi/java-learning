@@ -115,4 +115,31 @@ public class BeerServiceImpl implements BeerService {
             beerMap.put(oldBeer.getId(), oldBeer);
         });
     }
+
+    @Override
+    public void deleteById(UUID beerID) {
+        log.debug("deleteById - BeerServiceImpl.");
+        log.debug("Beer ID: " + beerID);
+        beerMap.remove(beerID);
+    }
+
+    @Override
+    public void patchBeerById(UUID beerId, Beer beer) {
+        log.debug("patchBeerById - BeerServiceImpl.");
+        log.debug("Beer ID: " + beerId);
+
+        Optional.ofNullable(beerMap.get(beerId)).ifPresent(oldBeer -> {
+            oldBeer.setId(beerId);
+            oldBeer.setBeerName(!beer.getBeerName().isEmpty() && !beer.getBeerName().isBlank() ? beer.getBeerName() : oldBeer.getBeerName());
+            oldBeer.setPrice(beer.getPrice() != null ? beer.getPrice() : oldBeer.getPrice());
+            oldBeer.setUpc(!beer.getUpc().isEmpty() && !beer.getUpc().isBlank() ? beer.getUpc() : oldBeer.getUpc());
+            oldBeer.setUpdateDate(LocalDateTime.now());
+            oldBeer.setVersion(beer.getVersion() != null ? beer.getVersion() : oldBeer.getVersion());
+            oldBeer.setQuantityOnHand(beer.getQuantityOnHand() != null ? beer.getQuantityOnHand() : oldBeer.getQuantityOnHand());
+            oldBeer.setCreatedDate(oldBeer.getCreatedDate());
+            oldBeer.setBeerStyle(beer.getBeerStyle() != null ? beer.getBeerStyle() : oldBeer.getBeerStyle());
+
+            beerMap.put(oldBeer.getId(), oldBeer);
+        });
+    }
 }
